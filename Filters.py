@@ -51,7 +51,7 @@ class Filter:
         img = np.array(img)
         filtro_alt, filtro_larg = filtro.shape
 
-        if len(img.shape) >= 2:
+        if len(img.shape) > 2:
             img = img.transpose(2,1,0)
             img_result = np.zeros_like(img)
 
@@ -71,7 +71,7 @@ class Filter:
             #        img_parte = img_pad[k][i: i + filtro_alt, j:j + filtro_larg]
             #        img_result[k][i, j]= np.clip(np.sum(img_parte * filtro), 0, 255)
 
-        if type(img)!=type([]) and len(img.shape) >= 2:
+        if type(img)!=type([]) and len(img.shape) > 2:
             return img_result.transpose(2,1,0)
         else:
             return img_result[0]
