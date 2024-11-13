@@ -127,7 +127,7 @@ class Filter:
       media2 = np.mean(img[g2])
 
       media = (media1 + media2) / 2
-    
+
     #print(media)
 
     particao = img > media
@@ -195,7 +195,7 @@ class Filter:
         desloc_x = x_dim if i < qtd_partes else x_dim_ultimos
         desloc_y = y_dim if j < qtd_partes else x_dim_ultimos
 
-        img_result[i*desloc_x : (i+1)*desloc_x, j*desloc_y : (j+1)*y_dim] = method(img[i*x_dim : (i+1)*x_dim, j*y_dim : (j+1)*y_dim])
+        img_result[i*desloc_x : (i+1)*desloc_x, j*desloc_y : (j+1)*y_dim] = method(img[i*desloc_x : (i+1)*desloc_x, j*desloc_y : (j+1)*desloc_y])
 
     return img_result
 
@@ -220,7 +220,7 @@ class Filter:
   def dilatacao(img, el= [[1,1,1],[1,1,1],[1,1,1]]):
     el = np.array(el)
     img = np.array(img)
-    img_pad = np.pad(img, (el.shape[0]//2, el.shape[1]//2), mode= 'constant', constant_values= 0)
+    img_pad = np.pad(img, (el.shape[0]//2, el.shape[1]//2), mode= 'constant', constant_values= 1)
     img_result = np.zeros_like(img)
 
     parte = np.lib.stride_tricks.sliding_window_view(img_pad, el.shape)
