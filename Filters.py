@@ -127,6 +127,8 @@ class Filter:
       media2 = np.mean(img[g2])
 
       media = (media1 + media2) / 2
+    
+    #print(media)
 
     particao = img > media
 
@@ -136,21 +138,49 @@ class Filter:
 
   @staticmethod
   def limiarizacao_otsu(img):
-    media = 0
-    media_ = -1
+    thresholding_max = -1
     var_cinza_max = -1
 
     img = np.array(img)
     img_result = np.zeros_like(img)
-    pos, hist = unique, counts = np.unique(img, return_counts=True)
 
-    for i in range(hist):
-      pass
+    pos, hist = unique, counts = np.unique(img, return_counts=True)
+    #print(hist)
+    prob = hist/len(img)
+
+    peso = lambda prob, r: np.sum(prob * r)
+    media = lambda index, prob, r, peso: np.sum((index * prob) * r) / peso
+    media_t = lambda index, prob, r: np.sum((index * prob) * r)
+    var = lambda peso0, peso1, media0, media1, media_t: peso0 * ((media0 - media_t)**2) + peso1 * ((media1 - media_t)**2)
+
+    p0 = 1
+    p1 = 1
+    m0 = 0
+    m1 = 0
+    index = np.fromfunction(lambda i: i, hist.shape)
+    #print(index.shape, hist.shape)
+    r = np.ones(len(hist))
+    for k in range(1, len(hist)):
+      p0 = peso(prob[0:k], r[0:k])
+      p1 = peso(prob[k:len(hist)], r[k: len(hist)])
+      m0 = media(index[0:k], prob[0:k], r[0:k], p0)
+      m1 = media(index[k:len(hist)], prob[k:len(hist)], r[k: len(hist)], p1)
+      m_t = media_t(index, prob, r)
+
+      var_t = var(p0, p1, m0, m1, m_t)
+
+      if var_t > var_cinza_max:
+        var_cinza_max = var_t
+        thresholding_max = k-1
+
+    particao = img >= thresholding_max
+
+    img_result[particao] = 1
 
     return img_result
 
   @staticmethod
-  def limiarizacao_adapt(img, qtd_partes= 2, method= limiarizacao_otsu):
+  def limiarizacao_adapt(img, method= limiarizacao_otsu, qtd_partes= 2):
     img = np.array(img)
     img_result = np.zeros_like(img)
 
