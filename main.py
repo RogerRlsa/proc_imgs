@@ -69,14 +69,12 @@ def apply_filter(filter_type):
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Limiarização(Thresholding)":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-        filtered_img = Filter.limiarizacao(gray)
-        filtered_img = Filter.limiarizacao(filtered_img)*255
+        filtered_img = Filter.limiarizacao(gray)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Limiarização(Otsu)":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-        filtered_img = Filter.limiarizacao(gray)
-        filtered_img = Filter.limiarizacao(filtered_img)*255
+        filtered_img = Filter.limiarizacao_adapt(gray)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
 
