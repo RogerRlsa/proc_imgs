@@ -73,6 +73,12 @@ def apply_filter(filter_type):
         filtered_img = Filter.limiarizacao(filtered_img)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
+    elif filter_type == "Limiarização(Otsu)":
+        gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+        filtered_img = Filter.limiarizacao(gray)
+        filtered_img = Filter.limiarizacao(filtered_img)*255
+        filtered_img = cv2.convertScaleAbs(filtered_img)
+        filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
 
     display_image(filtered_img, original=False)  # Exibe a imagem editada
 
@@ -112,6 +118,7 @@ filters_menu.add_command(label="High Pass Filter (laplaciano)", command=lambda: 
 filters_menu.add_command(label="Abertura", command=lambda: apply_filter("Abertura"))
 filters_menu.add_command(label="Fecho", command=lambda: apply_filter("Fecho"))
 filters_menu.add_command(label="Limiarização(Thresholding)", command=lambda: apply_filter("Limiarização(Thresholding)"))
+filters_menu.add_command(label="Limiarização(Otsu)", command=lambda: apply_filter("Limiarização(Otsu)"))
 
 # Cria a canvas para a imagem original com borda (sem background)
 original_image_canvas = tk.Canvas(root, width=500, height=500, bg="#2e2e2e", highlightthickness=1, highlightbackground="white")
