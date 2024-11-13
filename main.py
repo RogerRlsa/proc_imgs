@@ -55,6 +55,18 @@ def apply_filter(filter_type):
         filtered_img = Filter.sobel_filter(gray)
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
+    elif filter_type == "Dilatacao":
+        gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+        filtered_img = Filter.limiarizacao(gray)
+        filtered_img = Filter.dilatacao(filtered_img)*255
+        filtered_img = cv2.convertScaleAbs(filtered_img)
+        filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
+    elif filter_type == "Erosao":
+        gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+        filtered_img = Filter.limiarizacao(gray)
+        filtered_img = Filter.erosao(filtered_img)*255
+        filtered_img = cv2.convertScaleAbs(filtered_img)
+        filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Abertura":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         filtered_img = Filter.limiarizacao(gray)
@@ -113,6 +125,8 @@ filters_menu.add_command(label="Low Pass Filter (gaussiano)", command=lambda: ap
 filters_menu.add_command(label="Low Pass Filter (media)", command=lambda: apply_filter("low_pass_m"))
 filters_menu.add_command(label="High Pass Filter (sobel)", command=lambda: apply_filter("high_pass_s"))
 filters_menu.add_command(label="High Pass Filter (laplaciano)", command=lambda: apply_filter("high_pass_l"))
+filters_menu.add_command(label="Erosão", command=lambda: apply_filter("Erosao"))
+filters_menu.add_command(label="Dilatação", command=lambda: apply_filter("Dilatacao"))
 filters_menu.add_command(label="Abertura", command=lambda: apply_filter("Abertura"))
 filters_menu.add_command(label="Fecho", command=lambda: apply_filter("Fecho"))
 filters_menu.add_command(label="Limiarização(Thresholding)", command=lambda: apply_filter("Limiarização(Thresholding)"))
