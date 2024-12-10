@@ -162,11 +162,11 @@ def set_el(size=3, t='full'):
 el_menu = tk.Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label="Elemento morfológico", menu=el_menu)
 el_menu.add_command(label="Completo 3x3", command=lambda: set_el(3, 'full'))
-el_menu.add_command(label="Estrela 3x3", command=lambda: set_el(3, 'star'))
+#el_menu.add_command(label="Estrela 3x3", command=lambda: set_el(3, 'star'))
 el_menu.add_command(label="Completo 5x5", command=lambda: set_el(5, 'full'))
-el_menu.add_command(label="Estrela 5x5", command=lambda: set_el(5, 'star'))
+#el_menu.add_command(label="Estrela 5x5", command=lambda: set_el(5, 'star'))
 el_menu.add_command(label="Completo 7x7", command=lambda: set_el(7, 'full'))
-el_menu.add_command(label="Estrela 7x7", command=lambda: set_el(7, 'star'))
+#el_menu.add_command(label="Estrela 7x7", command=lambda: set_el(7, 'star'))
 
 
 # Filters menu

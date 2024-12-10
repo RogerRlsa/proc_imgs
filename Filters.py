@@ -193,7 +193,7 @@ class Filter:
     for i in range(qtd_partes):
       for j in range(qtd_partes):
         desloc_x = x_dim if i < qtd_partes else x_dim_ultimos
-        desloc_y = y_dim if j < qtd_partes else x_dim_ultimos
+        desloc_y = y_dim if j < qtd_partes else y_dim_ultimos
 
         img_result[i*desloc_x : (i+1)*desloc_x, j*desloc_y : (j+1)*y_dim] = method(img[i*desloc_x : (i+1)*desloc_x, j*desloc_y : (j+1)*desloc_y])
 
@@ -201,8 +201,8 @@ class Filter:
 
   @staticmethod
   def erosao(img, el= [[1,1,1],[1,1,1],[1,1,1]]):
-    el = np.array(el)
-    img = np.array(img)
+    el = np.array(el,dtype=int)
+    img = np.array(img,dtype=int)
     img_pad = np.pad(img, (el.shape[0]//2, el.shape[1]//2), mode= 'constant', constant_values= 0)
     img_result = np.zeros_like(img)
 
