@@ -67,12 +67,12 @@ class Filter:
       return sobel.transpose()
 
   @staticmethod
-  def gaussiano(img, size=3, dp=1):
+  def gaussiano(img, size=3, dp=0.8):
     return Filter.apply(img, Filter.gen_gaussiano(size, dp))
 
   @staticmethod
-  def laplaceano_gaussiana(img):
-    return Filter.apply(img, Filter.laplace)
+  def laplaceano_gaussiana(img, size=3, dp=0.8):
+    return Filter.apply(img, Filter.gen_laplaceano_gaussiana(size, dp))
 
   @staticmethod
   def media_filter(img, size=3):
