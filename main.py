@@ -39,20 +39,22 @@ def display_image(img, original=False):
         edited_image_canvas.create_image(x_offset, y_offset, anchor=tk.NW, image=img_tk)
 
 def apply_filter(filter_type):
+    global filtered_img
+
     if img_cv is None:
         return
     if filter_type == "low_pass_g":
-        filtered_img = Filter.gaussiano(img_cv)
+        filtered_img = Filter.gaussiano(img_cv, size=filter_size)
     elif filter_type == "low_pass_m":
-        filtered_img = Filter.media_filter(img_cv)
+        filtered_img = Filter.media_filter(img_cv, size=filter_size)
     elif filter_type == "high_pass_l":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-        filtered_img = Filter.laplaciano(gray)
+        filtered_img = Filter.laplaceano_gaussiana(gray, size=filter_size)*200
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "high_pass_s":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-        filtered_img = Filter.sobel_filter(gray)
+        filtered_img = Filter.sobel_filter(gray, size=filter_size)
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Dilatacao":
@@ -86,6 +88,11 @@ def apply_filter(filter_type):
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Limiarização(Otsu)":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+        filtered_img = Filter.limiarizacao_otsu(gray)*255
+        filtered_img = cv2.convertScaleAbs(filtered_img)
+        filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
+    elif filter_type == "Limiarização_adapt":
+        gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         filtered_img = Filter.limiarizacao_adapt(gray)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
@@ -94,6 +101,9 @@ def apply_filter(filter_type):
 
 def refresh_canvas():
     edited_image_canvas.delete("all")  # Limpa a canvas para exibir a nova imagem
+
+global filter_size
+filter_size = 3
 
 # Definindo a GUI
 root = tk.Tk()
@@ -131,6 +141,31 @@ filters_menu.add_command(label="Abertura", command=lambda: apply_filter("Abertur
 filters_menu.add_command(label="Fecho", command=lambda: apply_filter("Fecho"))
 filters_menu.add_command(label="Limiarização(Thresholding)", command=lambda: apply_filter("Limiarização(Thresholding)"))
 filters_menu.add_command(label="Limiarização(Otsu)", command=lambda: apply_filter("Limiarização(Otsu)"))
+filters_menu.add_command(label="Limiarização(Adaptativa)", command=lambda: apply_filter("Limiarização_adapt"))
+
+def set_size(val):
+    global filter_size
+    filter_size = val
+
+# Filter size
+size_menu = tk.Menu(menu_bar, tearoff=0)
+menu_bar.add_cascade(label="Filter size", menu=size_menu)
+size_menu.add_command(label="3x3",   command=lambda: set_size(3))
+size_menu.add_command(label="5x5",   command=lambda: set_size(5))
+size_menu.add_command(label="7x7",   command=lambda: set_size(7))
+size_menu.add_command(label="9x9",   command=lambda: set_size(9))
+size_menu.add_command(label="11x11", command=lambda: set_size(11))
+
+def save_temp():
+    global img_cv
+    img_cv = filtered_img
+    display_image(img_cv, original=True)
+    refresh_canvas()
+
+# save menu
+save_menu = tk.Menu(menu_bar, tearoff=0)
+menu_bar.add_cascade(label="Save", menu=save_menu)
+save_menu.add_command(label="Save (temporário)", command=lambda: save_temp())
 
 # Cria a canvas para a imagem original com borda (sem background)
 original_image_canvas = tk.Canvas(root, width=500, height=500, bg="#2e2e2e", highlightthickness=1, highlightbackground="white")
