@@ -41,44 +41,45 @@ def display_image(img, original=False):
 def apply_filter(filter_type):
     global filtered_img
     global filter_size
+
     if img_cv is None:
         return
     if filter_type == "low_pass_g":
-        filtered_img = Filter.gaussiano(img_cv, filter_size)
+        filtered_img = Filter.gaussiano(img_cv, size=filter_size)
     elif filter_type == "low_pass_m":
-        filtered_img = Filter.media_filter(img_cv, filter_size)
+        filtered_img = Filter.media_filter(img_cv, size=filter_size)
     elif filter_type == "high_pass_l":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-        filtered_img = Filter.laplaceano_gaussiana(gray, filter_size)*255
+        filtered_img = Filter.laplaceano_gaussiana(gray, size=filter_size)*200
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "high_pass_s":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-        filtered_img = Filter.sobel_filter(gray, filter_size)
+        filtered_img = Filter.sobel_filter(gray, size=filter_size)
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Dilatacao":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         filtered_img = Filter.limiarizacao(gray)
-        filtered_img = Filter.dilatacao(filtered_img)*255
+        filtered_img = Filter.dilatacao(filtered_img, el=elemento)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Erosao":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         filtered_img = Filter.limiarizacao(gray)
-        filtered_img = Filter.erosao(filtered_img)*255
+        filtered_img = Filter.erosao(filtered_img, el=elemento)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Abertura":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         filtered_img = Filter.limiarizacao(gray)
-        filtered_img = Filter.abertura(filtered_img)*255
+        filtered_img = Filter.abertura(filtered_img, el=elemento)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Fecho":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         filtered_img = Filter.limiarizacao(gray)
-        filtered_img = Filter.fechamento(filtered_img)*255
+        filtered_img = Filter.fechamento(filtered_img, el=elemento)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Limiarização(Thresholding)":
@@ -104,6 +105,9 @@ def refresh_canvas():
 
 global filter_size
 filter_size = 3
+global elemento
+elemento = [[1,1,1],[1,1,1],[1,1,1]]
+
 # Definindo a GUI
 root = tk.Tk()
 root.title("Image Processing App")
@@ -120,14 +124,50 @@ img_cv = None
 menu_bar = tk.Menu(root)
 root.config(menu=menu_bar)
 
-slider = tk.Scale(root, from_= 3, to= 11, tickinterval= 2, orient= 'horizontal')
-#slider.pack()
+
 # File menu
 file_menu = tk.Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label="File", menu=file_menu)
 file_menu.add_command(label="Load Image", command=load_image)
 file_menu.add_separator()
 file_menu.add_command(label="Exit", command=root.quit)
+
+def set_el(size=3, t='full'):
+    global elemento
+    elemento = []
+    if t == 'full':
+        for i in range(size):
+            elemento.append([])
+            for j in range(size):
+                elemento[i].append(1)
+    elif t == 'star':
+        meio = size//2
+        for i in range(size):
+            elemento.append([])
+            for j in range(size):
+                interv_menor = meio-i
+                interv_maior = meio+i
+                if interv_menor < 0:
+                    interv_menor = -meio+i
+                
+                interv_maior = size-interv_menor-1
+
+                if j >= interv_menor and j <= interv_maior:
+                    elemento[i].append(1)
+                else:
+                    elemento[i].append(0)
+
+
+# Elemento menu
+el_menu = tk.Menu(menu_bar, tearoff=0)
+menu_bar.add_cascade(label="Elemento morfológico", menu=el_menu)
+el_menu.add_command(label="Completo 3x3", command=lambda: set_el(3, 'full'))
+el_menu.add_command(label="Estrela 3x3", command=lambda: set_el(3, 'star'))
+el_menu.add_command(label="Completo 5x5", command=lambda: set_el(5, 'full'))
+el_menu.add_command(label="Estrela 5x5", command=lambda: set_el(5, 'star'))
+el_menu.add_command(label="Completo 7x7", command=lambda: set_el(7, 'full'))
+el_menu.add_command(label="Estrela 7x7", command=lambda: set_el(7, 'star'))
+
 
 # Filters menu
 filters_menu = tk.Menu(menu_bar, tearoff=0)
@@ -157,13 +197,18 @@ size_menu.add_command(label="7x7", command=lambda: set_size(7))
 size_menu.add_command(label="9x9", command=lambda: set_size(9))
 size_menu.add_command(label="11x11", command=lambda: set_size(11))
 
+def set_size(val):
+    global filter_size
+    filter_size = val
+
+
 def save_temp():
     global img_cv
     img_cv = filtered_img
-    display_image(img_cv, original=True)  # Exibe a imagem original
+    display_image(img_cv, original=True)
     refresh_canvas()
 
-# save_menu
+# save menu
 save_menu = tk.Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label="Save", menu=save_menu)
 save_menu.add_command(label="Save (temporário)", command=lambda: save_temp())
