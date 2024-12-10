@@ -60,25 +60,25 @@ def apply_filter(filter_type):
     elif filter_type == "Dilatacao":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         filtered_img = Filter.limiarizacao(gray)
-        filtered_img = Filter.dilatacao(filtered_img)*255
+        filtered_img = Filter.dilatacao(filtered_img, el=elemento)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Erosao":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         filtered_img = Filter.limiarizacao(gray)
-        filtered_img = Filter.erosao(filtered_img)*255
+        filtered_img = Filter.erosao(filtered_img, el=elemento)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Abertura":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         filtered_img = Filter.limiarizacao(gray)
-        filtered_img = Filter.abertura(filtered_img)*255
+        filtered_img = Filter.abertura(filtered_img, el=elemento)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Fecho":
         gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         filtered_img = Filter.limiarizacao(gray)
-        filtered_img = Filter.fechamento(filtered_img)*255
+        filtered_img = Filter.fechamento(filtered_img, el=elemento)*255
         filtered_img = cv2.convertScaleAbs(filtered_img)
         filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
     elif filter_type == "Limiarização(Thresholding)":
@@ -104,6 +104,8 @@ def refresh_canvas():
 
 global filter_size
 filter_size = 3
+global elemento
+elemento = [[1,1,1],[1,1,1],[1,1,1]]
 
 # Definindo a GUI
 root = tk.Tk()
@@ -121,12 +123,42 @@ img_cv = None
 menu_bar = tk.Menu(root)
 root.config(menu=menu_bar)
 
-# File menu
-file_menu = tk.Menu(menu_bar, tearoff=0)
-menu_bar.add_cascade(label="File", menu=file_menu)
-file_menu.add_command(label="Load Image", command=load_image)
-file_menu.add_separator()
-file_menu.add_command(label="Exit", command=root.quit)
+def set_el(size=3, t='full'):
+    global elemento
+    elemento = []
+    if t == 'full':
+        for i in range(size):
+            elemento.append([])
+            for j in range(size):
+                elemento[i].append(1)
+    elif t == 'star':
+        meio = size//2
+        for i in range(size):
+            elemento.append([])
+            for j in range(size):
+                interv_menor = meio-i
+                interv_maior = meio+i
+                if interv_menor < 0:
+                    interv_menor = -meio+i
+                
+                interv_maior = size-interv_menor-1
+
+                if j >= interv_menor and j <= interv_maior:
+                    elemento[i].append(1)
+                else:
+                    elemento[i].append(0)
+
+
+# Elemento menu
+el_menu = tk.Menu(menu_bar, tearoff=0)
+menu_bar.add_cascade(label="Elemento morfológico", menu=el_menu)
+el_menu.add_command(label="Completo 3x3", command=lambda: set_el(3, 'full'))
+el_menu.add_command(label="Estrela 3x3", command=lambda: set_el(3, 'star'))
+el_menu.add_command(label="Completo 5x5", command=lambda: set_el(5, 'full'))
+el_menu.add_command(label="Estrela 5x5", command=lambda: set_el(5, 'star'))
+el_menu.add_command(label="Completo 7x7", command=lambda: set_el(7, 'full'))
+el_menu.add_command(label="Estrela 7x7", command=lambda: set_el(7, 'star'))
+
 
 # Filters menu
 filters_menu = tk.Menu(menu_bar, tearoff=0)
